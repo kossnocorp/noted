@@ -1,0 +1,28 @@
+{
+  "name": "noted",
+  "version": "0.1.0",
+  "author": "Sasha Koss <kossnocorp@gmail.com>",
+  "description": "Notification controller for JavaScript",
+
+  "devDependencies": {
+    "coffee-script": "",
+    "mocha":         "",
+    "chai":          "",
+    "sinon":         "",
+    "sinon-chai":    ""
+  },
+
+  "dependencies": {
+    "lisn": ""
+  },
+
+  "license": "MIT",
+
+  "engine": {
+    "node": ">=0.4"
+  },
+
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha ./spec/*_spec.coffee --compilers coffee:coffee-script -R spec -c"
+  }
+}
