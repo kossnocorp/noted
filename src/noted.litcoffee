@@ -23,9 +23,16 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
 ### #constructor(body, group)
 
-      constructor: (body = '', @options = {}) ->
-        @_hidden = false
+      constructor: (body = '', id = undefined, @options = {}) ->
+        @_hidden =  if id and @options.store == 'cookie' and cookie?
+                      cookie.get("noted_#{id}_hidden") || false
+                    else if id and @options.store == 'store' and store?
+                      store.get("noted_#{id}_hidden") || false
+                    else
+                      false
+
         @setBody(body)
+        @setId(id)
         @listenTo(@, 'hide', @hide)
 
 ### #getBody()
@@ -48,6 +55,14 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
       setDelivered: (@delivered = true) ->
 
+### #getId()
+
+      getId: -> @_id
+
+### #setId(id)
+
+      setId: (@_id) ->
+
 ### #isHideden()
 
       isHidden: -> @_hidden
@@ -56,6 +71,10 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
       hide: ->
         @_hidden = true
+        if @options.store == 'cookie' and cookie?
+          cookie.set("noted_#{@getId()}_hidden", true)
+        else if @options.store == 'store' and store?
+          store.set("noted_#{@getId()}_hidden", true)
 
     extendWithEvents(Noted.Message::)
 
@@ -67,10 +86,20 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 ### #constructor(name)
 
       constructor: (@group, @name) ->
+        @_messages = []
 
 ### #getName()
 
       getName: -> @name
+
+### #getMessages()
+
+      getMessages: -> @_messages
+
+### #add(message)
+
+      add: (message) ->
+        @_messages.push(message)
 
 ### #getGroup()
 
@@ -133,19 +162,42 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
       constructor: ->
         @_eventGroups = {}
 
-### #subscribe(message, callback, [context])
+### #subscribe(message, callback, [context], [options])
 
-      subscribe: (message, callback, context) ->
+      subscribe: (message, callback, context, options = {}) ->
         event = @get(message)
-        event.getGroup().on(event.getName(), callback, context)
 
-### #publish(message, [content])
+        setDelivered = (args...) ->
+          message = if typeof args[0] == 'string'
+                      args[1]
+                    else
+                      args[0]
 
-      publish: (message, body) ->
+          message.setDelivered()
+
+          callback.apply(@, args)
+
+        setDelivered._callback = callback
+
+        if options.delayed
+          for message in event.getMessages()
+            if (not options.undelivered or not message.isDelivered()) and not message.isHidden()
+              setDelivered.call(@, message)
+
+        event.getGroup().on(event.getName(), setDelivered, context)
+
+### #publish(message, [content], [options])
+
+      publish: (message, body, options = {}) ->
+        # FIXME
+        [__, __, id] = @parse(message)
         event   = @get(message)
-        message = new Noted.Message(body)
+        message = new Noted.Message(body, id, options)
 
-        event.getGroup().trigger(event.getName(), message)
+        event.add(message)
+
+        unless message.isHidden()
+          event.getGroup().trigger(event.getName(), message)
 
         message
 
@@ -154,24 +206,23 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
       unsubscribe: (message, callback, context) ->
         if message
           event = @get(message)
-          event.getGroup().off(event.getName(), callback)
+          event.getGroup().off(event.getName(), callback, context)
         else
-          if context
-            for name, group of @_eventGroups
-              group.off(undefined, undefined, context)
+          for name, group of @_eventGroups
+            group.off(null, callback, context)
 
 ### #get(message)
 
       get: (message) ->
-        [groupName, eventName] = @parse(message)
+        [groupName, eventName, id] = @parse(message)
         group = @_eventGroups[groupName] ||= new Noted.EventGroup(groupName)
         group.get(eventName) || group.add(eventName)
 
 ### #parse(message)
 
       parse: (message) ->
-        [groupName, eventName] = message.match(/(?:(.+):|)(.*)/).slice(1)
-        [groupName, eventName || 'all']
+        [groupName, eventName, id] = message.match(/(?:(.+):|)([^#]*)(?:#(.+)|)/).slice(1)
+        [groupName, eventName || 'all', id]
 
 
 ## Noted.MessagesList
@@ -221,16 +272,38 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
         return message # WTF?
 
-### #trigger(event, [*args])
+### #trigger([options], event, [*args])
 
-      trigger: (event, args...) ->
-        for message in @_messages
+      trigger: (maybeOptions, maybeEvent, maybeArgs...) ->
+        if typeof maybeOptions == 'string'
+          options = {}
+          event   = maybeOptions
+          args    = [maybeEvent].concat(maybeArgs)
+        else
+          options = maybeOptions
+          event   = maybeEvent
+          args    = maybeArgs
+
+        messages =  if options.hidden
+                      @_messages
+                    else
+                      result = []
+                      for message in @_messages
+                        result.push(message) unless message.isHidden()
+                      result
+
+        for message in messages
           message.trigger(event, args...)
 
 ### #on(event, callback)
 
       on: (event, callback) ->
         @_events.on(event, callback, @context)
+
+### #off([event], [callback])
+
+      off: (event, callback) ->
+        @_events.off(event, callback)
 
 
 ## Noted.Emitter
@@ -252,24 +325,26 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
       constructor: ->
         super
 
-### #listen(message, callback)
+### #listen(message, callback, [options])
 
-      listen: (message, callback) ->
+      listen: (message, callback, options = {}) ->
         receiver = @
+
         storeMessage = (message, args...) ->
           receiver._messages.push(message)
           callback.apply(@, arguments)
 
-        storeMessage._callback = callback
+        # FIXME
+        callback._callback = storeMessage
 
-        @broker.subscribe(message, storeMessage, @context)
+        @broker.subscribe(message, storeMessage, @context, options)
 
 ### #stop([message], [callback])
 
 Export Noted object to global scope.
 
       stop: (message, callback) ->
-        @broker.unsubscribe(message, callback, @context)
+        @broker.unsubscribe(message, callback?._callback || callback, @context)
 
     if window?
       window.Noted = Noted

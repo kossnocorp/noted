@@ -13,6 +13,7 @@
 
       beforeEach ->
         @spy = sinon.spy()
+        global.cookie = undefined
 
 # Message class
 
@@ -82,6 +83,25 @@ Message has `delivered` state. `delivered` means "is this message delivered to a
                 @message.setDelivered(false)
                 @message.isDelivered().should.be.false
 
+## Message id
+
+          describe 'message has id', ->
+
+### #getId()
+
+            describe '#getId()', ->
+
+              it 'returns id', ->
+                should.not.exist @message.getId()
+
+### #setId(id)
+
+            describe '#setId(id)', ->
+
+              it 'sets id', ->
+                @message.setId(42)
+                @message.getId().should.eq 42
+
 ## Hide message
 
           describe 'can be hidden', ->
@@ -105,11 +125,51 @@ Message has `delivered` state. `delivered` means "is this message delivered to a
                 @message.trigger('hide')
                 @message.isHidden().should.be.true
 
-              it 'can store hidden state in cookies'
+              describe 'cookie usage', ->
 
-              it 'can store hidden state in localStorage'
+                beforeEach ->
+                  global.cookie =
+                    set: sinon.stub()
+                    get: sinon.stub()
 
-              it 'can store hidden state on server'
+                afterEach ->
+                  global.cookie = undefined
+
+                it 'can read hidden state in cookies', ->
+                  stub = sinon.stub().returns(true)
+                  cookie.get = stub
+
+                  message = new Noted.Message(42, 'trololo', store: 'cookie')
+                  message.isHidden().should.be.true
+                  stub.should.be.calledWith('noted_trololo_hidden')
+
+                it 'can store hidden state in cookies', ->
+                  message = new Noted.Message(42, 'trololo', store: 'cookie')
+                  message.hide()
+                  cookie.set.should.be.calledWith('noted_trololo_hidden', true)
+
+              describe 'localStorage usage', ->
+
+                beforeEach ->
+                  global.store =
+                    set: sinon.stub()
+                    get: sinon.stub()
+
+                afterEach ->
+                  global.store = undefined
+
+                it 'can read hidden state in stores', ->
+                  stub = sinon.stub().returns(true)
+                  store.get = stub
+
+                  message = new Noted.Message(42, 'trololo', store: 'store')
+                  message.isHidden().should.be.true
+                  stub.should.be.calledWith('noted_trololo_hidden')
+
+                it 'can store hidden state in stores', ->
+                  message = new Noted.Message(42, 'trololo', store: 'store')
+                  message.hide()
+                  store.set.should.be.calledWith('noted_trololo_hidden', true)
 
 # Event class
 
@@ -137,8 +197,32 @@ Event name is id.
 
 ### #getName()
 
-            it 'returns event name', ->
-              @event.getName().should.eq 'test'
+            describe '#getName()', ->
+
+              it 'returns event name', ->
+                @event.getName().should.eq 'test'
+
+## Messages list
+
+Noted.Event has messages list. It used to save all triggered messages.
+
+          describe 'has name', ->
+
+### #getMessages()
+
+            describe '#getMessages()', ->
+
+              it 'returns list of messages', ->
+                @event.getMessages().should.eql []
+
+### #add(message)
+
+            describe '#add()', ->
+
+              it 'adds message to list', ->
+                message = new Noted.Message()
+                @event.add(message)
+                @event.getMessages().should.eql [message]
 
 ## Grouping
 
@@ -279,7 +363,7 @@ class MessagesTab
             @broker.publish('event')
             @spy.should.be.calledOnce
 
-### #subscribe(message, callback, [context])
+### #subscribe(message, callback, [context], [options])
 
 `subscribe` is main function to subscribe to notifications.
 
@@ -301,7 +385,29 @@ Second argument is a callback.
               message = @broker.publish('group:qwerty')
               @spy.should.be.calledTwice
 
-### #publish(message, [content])
+            it 'can be delayed', ->
+              @broker.publish('group:some_message')
+              @broker.publish('group:some_message')
+              @broker.subscribe('group:some_message', @spy, null, delayed: true)
+              @spy.should.be.calledTwice
+
+            it 'ignore hidden message for delayed subscribe', ->
+              message = @broker.publish('group:some_message')
+              message.hide()
+              @broker.publish('group:some_message')
+              @broker.subscribe('group:some_message', @spy, null, delayed: true)
+              @spy.should.be.calledOnce
+
+            it 'can be delayed only for undelivered messages', ->
+              spyB = sinon.spy()
+              message = @broker.publish('group:some_message', 34)
+              @broker.subscribe('group:some_message', spyB)
+              @broker.publish('group:some_message')
+              @broker.subscribe('group:some_message', @spy, null, delayed: true, undelivered: true)
+              @spy.should.be.calledOnce
+              @spy.should.be.calledWith(message)
+
+### #publish(message, [content], [options])
 
 Publish delivering message to every listener. You should specify message as string separated underscores.
 
@@ -314,6 +420,42 @@ Publish delivering message to every listener. You should specify message as stri
 
             it 'returns notification instance', ->
               @broker.publish('event').should.be.instanceOf(Noted.Message)
+
+            it 'marks message as delivered', ->
+              @broker.subscribe('event', @spy)
+              messageA = @broker.publish('event')
+              messageB = @broker.publish('test')
+              messageA.isDelivered().should.be.true
+              messageB.isDelivered().should.be.false
+
+            it 'assigns specified id', ->
+              message = @broker.publish('group_name:event_name#uniq_id')
+              message.getId().should.eq 'uniq_id'
+
+            it 'add message to event list', ->
+              message = @broker.publish('group_name:event_name')
+              event   = @broker.get('group_name:event_name')
+              event.getMessages().should.eql [message]
+
+            it 'not emit event if message is hidden', ->
+              message = new Noted.Message()
+              message.hide()
+              @broker.subscribe('test', @spy)
+              OriginMessage = Noted.Message
+              Noted.Message = -> message
+              @broker.publish('test', 42)
+              @spy.should.not.be.called
+              Noted.Message = OriginMessage
+
+            it 'passes options to message constructor', ->
+              message = new Noted.Message()
+              OriginMessage = Noted.Message
+              stub = sinon.stub().returns(message)
+              Noted.Message = stub
+              options = { qwe: true }
+              @broker.publish('group:test#id', 42, options)
+              stub.should.be.calledWith(42, 'id', options)
+              Noted.Message = OriginMessage
 
 ### #unsubscribe(message, callback, [context])
 
@@ -333,12 +475,14 @@ Publish delivering message to every listener. You should specify message as stri
 
             it 'unsubscribes every message for given context', ->
               spyB = sinon.spy()
+              ctxA = {}
               ctxB = {}
-              @broker.subscribe('event', @spy, @ctx)
+              @broker.subscribe('event', @spy, ctxA)
               @broker.subscribe('event', spyB, ctxB)
-              @broker.unsubscribe(undefined, undefined, @ctx)
+              @broker.unsubscribe(null, null, ctxA)
               @broker.publish('event')
               @spy.should.not.be.called
+              spyB.should.be.called
 
 
 ## Events list
@@ -351,6 +495,10 @@ Broker can be used as access to events and event groups.
 
             it 'returns exist or new event for passed message', ->
               event = @broker.get('group_name:event_name')
+              event.getName().should.eq 'event_name'
+
+            it 'returns event for passed message with id', ->
+              event = @broker.get('group_name:event_name#uniq_id')
               event.getName().should.eq 'event_name'
 
 ## Event groups
@@ -371,6 +519,12 @@ Broker can be used as access to events and event groups.
               [groupName, eventName] = @broker.parse('group_name:')
               groupName.should.eq 'group_name'
               eventName.should.eq 'all'
+
+            it 'parses message id', ->
+              [groupName, eventName, id] = @broker.parse('group_name:event#some_id')
+              groupName.should.eq 'group_name'
+              eventName.should.eq 'event'
+              id.should.eq 'some_id'
 
 ## Async delivering
 
@@ -455,11 +609,9 @@ TODO
               message = new Noted.Message()
               @messagesList.store(message).should.eq message
 
-### #retrigger()
+### #trigger([options], event, [*args])
 
-### #trigger(event, [*args])
-
-          describe '#trigger(event, [*args])', ->
+          describe '#trigger([options], event, [*args])', ->
 
             it 'trigger events for all stored messages', ->
               spyB = sinon.spy()
@@ -471,13 +623,9 @@ TODO
               @spy.should.be.calledWith(42)
               spyB.should.be.calledWith(42)
 
-            it 'ignores hidden messages'
+### #on(event, callback)
 
-            it 'allow to specify when hidden messages should be trigerred'
-
-### #on(event)
-
-          describe '#on(event, callback)', ->
+          describe '#on(event, callback, [options])', ->
 
             it 'listen to stored messages event', ->
               message = new Noted.Message()
@@ -486,15 +634,58 @@ TODO
               message.trigger('trololo', 42)
               @spy.should.be.calledWith(message, 42)
 
-            it 'ignores hidden messages'
+            it 'ignores hidden messages', ->
+              spyB = sinon.spy()
+              messageA = @messagesList.store(new Noted.Message())
+              messageB = @messagesList.store(new Noted.Message())
+              messageA.on('test', @spy)
+              messageB.on('test', spyB)
+              messageA.trigger('hide')
+              @messagesList.trigger('test', 42)
+              @spy.should.not.be.called
+              spyB.should.be.calledWith(42)
 
-            it 'allow to specify when hidden messages should be trigerred'
+            it 'allow to specify when hidden messages should be trigerred', ->
+              spyB = sinon.spy()
+              messageA = @messagesList.store(new Noted.Message())
+              messageB = @messagesList.store(new Noted.Message())
+              messageA.on('test', @spy)
+              messageB.on('test', spyB)
+              messageA.trigger('hide')
+              @messagesList.trigger(hidden: true, 'test', 42)
+              @spy.should.be.calledWith(42)
+              spyB.should.be.calledWith(42)
 
 ### #off([event], [callback])
 
           describe '#off([event], [callback])', ->
 
-            it 'stop listening stored messages'
+            it 'stop listening stored messages', ->
+              message = new Noted.Message()
+              @messagesList.store(message)
+              @messagesList.on('trololo', @spy)
+              @messagesList.off('trololo', @spy)
+              message.trigger('trololo', 42)
+              @spy.should.not.be.called
+
+            it 'stop listening stored messages by event', ->
+              message = new Noted.Message()
+              @messagesList.store(message)
+              @messagesList.on('trololo', @spy)
+              @messagesList.off('trololo')
+              message.trigger('trololo', 42)
+              @spy.should.not.be.called
+
+            it 'stop listening all events', ->
+              message = new Noted.Message()
+              @messagesList.store(message)
+              @messagesList.on('trololo', @spy)
+              @messagesList.on('test', @spy)
+              @messagesList.off()
+              message.trigger('trololo')
+              message.trigger('test')
+              @spy.should.not.be.called
+
 
 # Emitter class
 
@@ -540,7 +731,7 @@ TODO
 
         describe 'listen broker', ->
 
-### #listen(message, callback)
+### #listen(message, callback, [options])
 
           describe '#listen(message, callback)', ->
 
@@ -561,7 +752,21 @@ TODO
               message = @broker.publish('some_message')
               @spy.should.be.called
 
-### #stop([message], [callback])
+            it 'can listen to emitted messages before listen is called', ->
+              @broker.publish('some_message')
+              @receiver.listen('some_message', @spy, delayed: true)
+              @spy.should.be.called
+
+            it 'can listen to emitted and undelivered messages before listen is called', ->
+              spyB = sinon.spy()
+              message = @broker.publish('some_message', 34)
+              @receiver.listen('some_message', spyB)
+              @broker.publish('some_message')
+              @receiver.listen('some_message', @spy, delayed: true, undelivered: true)
+              @spy.should.be.calledOnce
+              @spy.should.be.calledWith(message)
+
+##k #stop([message], [callback])
 
           describe '#stop([message], [callback])', ->
 
