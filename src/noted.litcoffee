@@ -135,6 +135,14 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
         else
           @_eventObjs[event] = new Noted.Event(@, event)
 
+### #all()
+
+      all: ->
+        result = []
+        for name, event of @_eventObjs
+          result.push(event)
+        result
+
 ### #get(name)
 
       get: (name) ->
@@ -180,9 +188,16 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
         setDelivered._callback = callback
 
         if options.delayed
-          for message in event.getMessages()
-            if (not options.undelivered or not message.isDelivered()) and not message.isHidden()
-              setDelivered.call(@, message)
+          if event.getName() == 'all'
+            for name, group of @_eventGroups
+              for event in group.all()
+                for message in event.getMessages()
+                  if (not options.undelivered or not message.isDelivered()) and not message.isHidden()
+                    setDelivered.call(@, event.getName(), message)
+          else
+            for message in event.getMessages()
+              if (not options.undelivered or not message.isDelivered()) and not message.isHidden()
+                setDelivered.call(@, message)
 
         event.getGroup().on(event.getName(), setDelivered, context)
 

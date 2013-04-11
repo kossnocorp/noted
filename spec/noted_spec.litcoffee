@@ -288,6 +288,16 @@ Event name is id.
                 @eventGroup.add(@event).should.be.instanceOf(Noted.Event)
                 @eventGroup.add('asd').should.be.instanceOf(Noted.Event)
 
+### #all()
+
+            describe '#all()', ->
+
+              it 'returns all events', ->
+                @qwerty = new Noted.Event(null, 'qwerty')
+                @eventGroup.add(@event)
+                @eventGroup.add(@qwerty)
+                @eventGroup.all().should.eql [@event, @qwerty]
+
 ### #get(name)
 
             describe '#get(name)', ->
@@ -389,6 +399,12 @@ Second argument is a callback.
               @broker.publish('group:some_message')
               @broker.publish('group:some_message')
               @broker.subscribe('group:some_message', @spy, null, delayed: true)
+              @spy.should.be.calledTwice
+
+            it 'can be delayed for event group', ->
+              @broker.publish('group:some_message')
+              @broker.publish('group:some_message')
+              @broker.subscribe('group:', @spy, null, delayed: true)
               @spy.should.be.calledTwice
 
             it 'ignore hidden message for delayed subscribe', ->
