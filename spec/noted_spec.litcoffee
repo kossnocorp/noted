@@ -401,6 +401,12 @@ Second argument is a callback.
               @broker.subscribe('group:some_message', @spy, null, delayed: true)
               @spy.should.be.calledTwice
 
+            it 'uses passed context when it delayed', ->
+              ctx = spy: @spy
+              @broker.publish('group:some_message')
+              @broker.subscribe('group:some_message', (-> @spy()), ctx, delayed: true)
+              @spy.should.be.called
+
             it 'can be delayed for event group', ->
               @broker.publish('group:some_message')
               @broker.publish('group:some_message')

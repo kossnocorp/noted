@@ -193,11 +193,11 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
               for event in group.all()
                 for message in event.getMessages()
                   if (not options.undelivered or not message.isDelivered()) and not message.isHidden()
-                    setDelivered.call(@, event.getName(), message)
+                    setDelivered.call(context, event.getName(), message)
           else
             for message in event.getMessages()
               if (not options.undelivered or not message.isDelivered()) and not message.isHidden()
-                setDelivered.call(@, message)
+                setDelivered.call(context, message)
 
         event.getGroup().on(event.getName(), setDelivered, context)
 
