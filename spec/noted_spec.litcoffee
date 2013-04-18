@@ -496,6 +496,24 @@ Publish delivering message to every listener. You should specify message as stri
               stub.should.be.calledWith(42, 'id', options)
               Noted.Message = OriginMessage
 
+            it 'setup auto hide if options.hideAfter exist', ->
+              clock = sinon.useFakeTimers()
+              spy = sinon.stub(Noted.Message::, 'hide')
+              @broker.publish('event', null, hideAfter: 3000)
+              clock.tick(3500)
+              spy.should.be.called
+              spy.restore()
+              clock.restore()
+
+            it 'setup auto hide if options.hideAfter exist', ->
+              clock = sinon.useFakeTimers()
+              spy = sinon.stub(Noted.Message::, 'hide')
+              @broker.publish('event', null, hideAfter: 3000, storeHide: true)
+              clock.tick(3500)
+              spy.should.be.calledWith(false)
+              spy.restore()
+              clock.restore()
+
 ### #unsubscribe(message, callback, [context])
 
           describe '#unsubscribe()', ->
@@ -755,6 +773,12 @@ TODO
               message = @emitter.emit('test', 42)
               message.getBody().should.eq 42
               message.should.be.instanceOf Noted.Message
+
+            it 'passes options to broker', ->
+              spy = sinon.stub(@broker, 'publish')
+              options = { a: 1, b: 2 }
+              @emitter.emit('test', 42, options)
+              spy.should.be.calledWith('test', 42, options)
 
 
 # Receiver class

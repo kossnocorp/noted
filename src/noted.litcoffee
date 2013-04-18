@@ -225,6 +225,10 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
         unless message.isHidden()
           event.getGroup().trigger(event.getName(), message)
 
+        if options.hideAfter
+          hideFn = -> message.hide(if options.storeHide then not options.storeHide)
+          setTimeout(hideFn, options.hideAfter)
+
         message
 
 ### #unsubscribe(message, callback, [context])
@@ -338,8 +342,8 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
 ### #emit(message, body)
 
-      emit: (message, body) ->
-        message = @broker.publish(message, body)
+      emit: (message, body, options) ->
+        message = @broker.publish(message, body, options)
         @_messages.push(message)
         message
 
