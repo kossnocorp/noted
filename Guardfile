@@ -4,7 +4,7 @@ class MochaRunner
                 '--compilers litcoffee:coffee-script',
                 '-R spec',
                 '-c' ].join(' ')
-  ALL_PATH  = './spec/*_spec.litcoffee'
+  ALL_PATH  = './spec/*_spec.coffee ./spec/*_spec.litcoffee'
 
   def self.run!(m)
     system cmd(path(m))

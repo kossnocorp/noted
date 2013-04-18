@@ -23,6 +23,6 @@
   },
 
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha ./spec/*_spec.coffee --compilers coffee:coffee-script -R spec -c"
+    "test": "./node_modules/mocha/bin/mocha ./spec/*_spec.coffee ./spec/*_spec.litcoffee --compilers coffee:coffee-script --compilers litcoffee:coffee-script -R spec -c"
   }
 }
