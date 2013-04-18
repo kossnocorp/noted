@@ -125,6 +125,11 @@ Message has `delivered` state. `delivered` means "is this message delivered to a
                 @message.trigger('hide')
                 @message.isHidden().should.be.true
 
+              it 'should trigger hide event', ->
+                @message.on('hide', @spy)
+                @message.hide()
+                @spy.should.be.called
+
               describe 'cookie usage', ->
 
                 beforeEach ->

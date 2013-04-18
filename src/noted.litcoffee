@@ -33,7 +33,7 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
         @setBody(body)
         @setId(id)
-        @listenTo(@, 'hide', @hide)
+        @listenTo(@, 'hide', @_hide)
 
 ### #getBody()
 
@@ -70,6 +70,11 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 ### #hide()
 
       hide: ->
+        @trigger('hide')
+
+### #_hide()
+
+      _hide: ->
         @_hidden = true
         if @options.store == 'cookie' and cookie?
           cookie.set("noted_#{@getId()}_hidden", true)
