@@ -153,6 +153,13 @@ Message has `delivered` state. `delivered` means "is this message delivered to a
                   message.hide()
                   cookie.set.should.be.calledWith('noted_trololo_hidden', true)
 
+                it 'ignores hide if first argument is true', ->
+                  messageA = new Noted.Message(42, 'trololo', store: 'cookie')
+                  messageA.hide(true)
+                  messageB = new Noted.Message(42, 'trololo', store: 'cookie')
+                  messageB.trigger('hide', true)
+                  cookie.set.should.not.be.called
+
               describe 'localStorage usage', ->
 
                 beforeEach ->

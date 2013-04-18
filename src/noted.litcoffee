@@ -69,13 +69,16 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
 ### #hide()
 
-      hide: ->
-        @trigger('hide')
+      hide: (doNotStore) ->
+        @trigger('hide', doNotStore)
 
 ### #_hide()
 
-      _hide: ->
+      _hide: (message, doNotStore = false) ->
         @_hidden = true
+
+        return if doNotStore
+
         if @options.store == 'cookie' and cookie?
           cookie.set("noted_#{@getId()}_hidden", true)
         else if @options.store == 'store' and store?
