@@ -53,6 +53,11 @@ Body is content message. Not every Message contain body, because is not necessar
                 @message[fn].should.be.defined
                 @message[fn].should.be.a 'function'
 
+            it 'overries default Backbone.Events.trigger behaviour and pass self as first argument', ->
+              @message.on('event', @spy)
+              @message.trigger('event', 'test')
+              @spy.should.be.calledWith(@message, 'test')
+
 ## Delivering status
 
 Message has `delivered` state. `delivered` means "is this message delivered to any listener?". If `delivered` is true well then at least one listener received this message.

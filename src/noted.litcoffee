@@ -86,6 +86,9 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
     extendWithEvents(Noted.Message::)
 
+    Noted.Message::trigger = (event, args...) ->
+      Events.trigger.call(@, event, @, args...)
+
 
 ## Noted.Event
 
@@ -289,7 +292,7 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
         @_messages.push(message)
 
         retrigger = (event, args...) ->
-          @_events.trigger(event, message, args...)
+          @_events.trigger(event, args...)
 
         message.on('all', retrigger, @)
 
@@ -316,7 +319,7 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
                       result
 
         for message in messages
-          message.trigger(event, message, args...)
+          message.trigger(event, args...)
 
 ### #on(event, callback)
 
