@@ -15,7 +15,7 @@ See [milestones](https://github.com/kossnocorp/noted/issues/milestones).
 
 This project uses [Semantic Versioning](http://semver.org/) for release numbering.
 
-### v0.1.0 (unreleased)
+### v0.1.0 (19 April, 2013)
 
 First, initial release.
 
