@@ -8,6 +8,15 @@ Noted.js designed for use with Backbone.js and depends on Backbone.Events.
 
 TODO
 
+## How big is Noted.js?
+
+It's tiny.
+
+```
+GZipped & uglified: 1.9kb
+Development:        12.42kb
+```
+
 ## Quick example
 
 TODO
