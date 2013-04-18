@@ -1,11 +1,16 @@
-# Noted.js - notification controller for JavaScript
+# Noted.js - advanced events for JavaScript
 
 [![Build Status](https://secure.travis-ci.org/kossnocorp/noted.png?branch=master)](http://travis-ci.org/kossnocorp/noted)
 
-Noted.js useful for managing notifications, like flash-messages, sticky announces and so on.
+Noted.js designed for use with Backbone.js and depends on Backbone.Events.
+
+## Key features
+
+TODO
 
 ## Quick example
 
+TODO
 
 ## Roadmap
 
