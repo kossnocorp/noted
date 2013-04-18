@@ -642,8 +642,8 @@ TODO
               messageA.on('test', @spy)
               messageB.on('test', spyB)
               @messagesList.trigger('test', 42)
-              @spy.should.be.calledWith(42)
-              spyB.should.be.calledWith(42)
+              @spy.should.be.calledWith(messageA, 42)
+              spyB.should.be.calledWith(messageB, 42)
 
 ### #on(event, callback)
 
@@ -665,7 +665,7 @@ TODO
               messageA.trigger('hide')
               @messagesList.trigger('test', 42)
               @spy.should.not.be.called
-              spyB.should.be.calledWith(42)
+              spyB.should.be.calledWith(messageB, 42)
 
             it 'allow to specify when hidden messages should be trigerred', ->
               spyB = sinon.spy()
@@ -675,8 +675,8 @@ TODO
               messageB.on('test', spyB)
               messageA.trigger('hide')
               @messagesList.trigger(hidden: true, 'test', 42)
-              @spy.should.be.calledWith(42)
-              spyB.should.be.calledWith(42)
+              @spy.should.be.calledWith(messageA, 42)
+              spyB.should.be.calledWith(messageB, 42)
 
 ### #off([event], [callback])
 

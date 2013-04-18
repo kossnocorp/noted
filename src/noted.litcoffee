@@ -308,7 +308,7 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
                       result
 
         for message in messages
-          message.trigger(event, args...)
+          message.trigger(event, message, args...)
 
 ### #on(event, callback)
 
