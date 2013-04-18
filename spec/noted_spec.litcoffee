@@ -800,7 +800,7 @@ TODO
               @spy.should.be.calledOnce
               @spy.should.be.calledWith(message)
 
-##k #stop([message], [callback])
+### #stop([message], [callback])
 
           describe '#stop([message], [callback])', ->
 
