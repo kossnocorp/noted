@@ -6,6 +6,20 @@ Noted.js designed for use with Backbone.js and depends on Backbone.Events.
 
 ## Key features
 
+### Async!
+
+Don't bother about initialization order.
+
+``` js
+broker.publish('event');
+
+broker.subscribe('event', function (message) {
+    console.log('w00t!');
+}, null, { delayed: true });
+
+//=> "w00t!"
+```
+
 ### When you trigger event you get message object with own events
 
 It give you ability to communicate in two ways through "model" of emitted message.
