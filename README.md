@@ -63,19 +63,13 @@ See [milestones](https://github.com/kossnocorp/noted/issues/milestones).
 
 ## Changelog
 
+See [releases](https://github.com/kossnocorp/noted/releases),
+
 This project uses [Semantic Versioning](http://semver.org/) for release numbering.
-
-### v0.1.1 (26 July, 2013)
-
-* Fix problem with delayed subscription to events group
-
-### v0.1.0 (19 April, 2013)
-
-First, initial release.
 
 ## Contributors
 
-Idea and code by [@kossnocorp](http://koss.nocorp.me/).
+Idea and code by [@kossnocorp](http://koss.nocorp.me).
 
 Check out full list of [contributors](https://github.com/kossnocorp/noted/contributors).
 
@@ -83,7 +77,7 @@ Initially sponsored by [Toptal](http://toptal.com/).
 
 ## Additional info
 
-This project is a member of the [OSS Manifesto](http://ossmanifesto.org/).
+This project is a member of the [OSS Manifesto](http://ossmanifesto.org).
 
 ## License
 
