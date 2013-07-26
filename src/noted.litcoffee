@@ -200,7 +200,8 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
         if options.delayed
           if event.getName() == 'all'
-            for name, group of @_eventGroups
+            eventGroups = [event.getGroup()] || @_eventGroups
+            for name, group of eventGroups
               for event in group.all()
                 for message in event.getMessages()
                   if (not options.undelivered or not message.isDelivered()) and not message.isHidden()
