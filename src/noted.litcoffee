@@ -1,4 +1,4 @@
-# Noted.js v0.1.0
+# Noted.js v0.1.1
 
 (c) 2013 Sasha Koss.
 
