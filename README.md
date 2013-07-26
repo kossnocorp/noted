@@ -49,8 +49,9 @@ TODO
 It's tiny.
 
 ```
-GZipped & uglified: 1.9kb
-Development:        12.42kb
+Original size: 12763b or 12.46kb
+Uglified size: 6265b (49% from original size)
+GZipped size:  1932b or 1.89kb (15% from original size)
 ```
 
 ## Quick example
@@ -63,7 +64,7 @@ See [milestones](https://github.com/kossnocorp/noted/issues/milestones).
 
 ## Changelog
 
-See [releases](https://github.com/kossnocorp/noted/releases),
+See [releases](https://github.com/kossnocorp/noted/releases).
 
 This project uses [Semantic Versioning](http://semver.org/) for release numbering.
 
