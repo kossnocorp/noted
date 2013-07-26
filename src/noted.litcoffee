@@ -24,13 +24,7 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 ### #constructor(body, group)
 
       constructor: (body = '', id = undefined, @options = {}) ->
-        @_hidden =  if id and @options.store == 'cookie' and cookie?
-                      cookie.get("noted_#{id}_hidden") || false
-                    else if id and @options.store == 'store' and store?
-                      store.get("noted_#{id}_hidden") || false
-                    else
-                      false
-
+        @_hidden = @_isHidden(id)
         @setBody(body)
         @setId(id)
         @listenTo(@, 'hide', @_hide)
@@ -84,11 +78,29 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
         else if @options.store == 'store' and store?
           store.set("noted_#{@getId()}_hidden", true)
 
+### #_isHidden(id)
+
+      _isHidden: (id) ->
+        if id and storage = @_storage()
+          hiddenKey = "noted_#{id}_hidden"
+          storage.get(hiddenKey) or false
+        else
+          false
+
+### #_storage()
+
+      _storage: ->
+        if @options.store is 'cookie' and cookie?
+          cookie
+        else if @options.store is 'store' and store?
+          store
+        else
+          null
+
     extendWithEvents(Noted.Message::)
 
     Noted.Message::trigger = (event, args...) ->
       Events.trigger.call(@, event, @, args...)
-
 
 ## Noted.Event
 
@@ -148,11 +160,7 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
 ### #all()
 
-      all: ->
-        result = []
-        for name, event of @_eventObjs
-          result.push(event)
-        result
+      all: -> event for name, event of @_eventObjs
 
 ### #get(name)
 
@@ -162,11 +170,7 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 ### #remove(event)
 
       remove: (event) ->
-        name =  if event instanceof Noted.Event
-                  event.name
-                else
-                  event
-
+        name = if event instanceof Noted.Event then event.name else event
         delete @_eventObjs[name]
 
     extendWithEvents(Noted.EventGroup::)
@@ -175,6 +179,8 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 ## Noted.Broker
 
     class Noted.Broker
+
+      MESSAGE_PATTERN = /(?:(.+):|)([^#]*)(?:#(.+)|)/
 
 ### #constructor()
 
@@ -187,11 +193,7 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
         event = @get(message)
 
         setDelivered = (args...) ->
-          message = if typeof args[0] == 'string'
-                      args[1]
-                    else
-                      args[0]
-
+          message = if typeof args[0] is 'string' then args[1] else args[0]
           message.setDelivered()
 
           callback.apply(@, args)
@@ -216,9 +218,8 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 ### #publish(message, [content], [options])
 
       publish: (message, body, options = {}) ->
-        # FIXME
-        [__, __, id] = @parse(message)
-        event   = @get(message)
+        id = @parse(message)[2]
+        event = @get(message)
         message = new Noted.Message(body, id, options)
 
         event.add(message)
@@ -252,7 +253,7 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 ### #parse(message)
 
       parse: (message) ->
-        [groupName, eventName, id] = message.match(/(?:(.+):|)([^#]*)(?:#(.+)|)/).slice(1)
+        [groupName, eventName, id] = message.match(MESSAGE_PATTERN).slice(1)
         [groupName, eventName || 'all', id]
 
 
@@ -301,7 +302,7 @@ Noted depends on Backbone.Events or Lisn (TODO). Backbone.Events can be also rep
 
         message.on('all', retrigger, @)
 
-        return message # WTF?
+        message
 
 ### #trigger([options], event, [*args])
 
