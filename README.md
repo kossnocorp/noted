@@ -2,7 +2,12 @@
 
 [![Build Status](https://secure.travis-ci.org/kossnocorp/noted.png?branch=master)](http://travis-ci.org/kossnocorp/noted)
 
-Noted.js designed for use with Backbone.js and depends on Backbone.Events.
+Noted.js is fully featured and highly customizible events library for JavaScript. It designed to be used inside of 
+[facade](http://en.wikipedia.org/wiki/Facade_pattern). With Noted.js you can easily implement 
+[publish–subscribe](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern), TODO.
+
+Originally Noted.js was designed for use with Backbone.js and depends on Backbone.Events. In future this will be changed
+in order to make it more lightweight.
 
 ## Key features
 
