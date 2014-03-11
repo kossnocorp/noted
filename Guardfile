@@ -1,10 +1,9 @@
 class MochaRunner
   MOCHA_BIN = './node_modules/mocha/bin/mocha'
   FLAGS     = [ '--compilers coffee:coffee-script',
-                '--compilers litcoffee:coffee-script',
                 '-R spec',
                 '-c' ].join(' ')
-  ALL_PATH  = './spec/*_spec.coffee ./spec/*_spec.litcoffee'
+  ALL_PATH  = './spec/*_spec.coffee'
 
   def self.run!(m)
     system cmd(path(m))
@@ -18,7 +17,7 @@ class MochaRunner
     if m[1] == 'spec'
       m[0]
     else
-      "spec/#{m[2]}_spec.litcoffee"
+      "spec/#{m[2]}_spec.coffee"
     end
   end
 end
