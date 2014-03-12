@@ -4,147 +4,6 @@ describe 'Noted library', ->
     @spy = sinon.spy()
     global.cookie = undefined
 
-  describe 'Message class', ->
-
-    beforeEach ->
-      @message = new Noted.Message('Test')
-
-    describe 'body', ->
-
-      describe '#getBody()', ->
-
-        it 'returns body message', ->
-          @message.getBody().should.eq 'Test'
-
-      describe '#setBody()', ->
-
-        it 'apply new body to message', ->
-          @message.setBody('42 is the answer.')
-          @message.getBody().should.eq '42 is the answer.'
-
-    describe 'extended with Backbone.Events', ->
-
-      it 'has Backbone.Events functions', ->
-        fns = 'on off once listenTo stopListening listenToOnce'.split(/\s/)
-        for fn in fns
-          @message[fn].should.be.defined
-          @message[fn].should.be.a 'function'
-
-      it 'overries default Backbone.Events.trigger behaviour and pass self as first argument', ->
-        @message.on('event', @spy)
-        @message.trigger('event', 'test')
-        @spy.should.be.calledWith(@message, 'test')
-
-    describe 'delivered state', ->
-
-      describe '#isDelivered()', ->
-
-        it 'marks as delivered by default', ->
-          @message.isDelivered().should.be.false
-
-        it 'returns actual state of notification', ->
-          @message.setDelivered()
-          @message.isDelivered().should.be.true
-
-      describe '#setDelivered()', ->
-
-        it 'sets delivered to true', ->
-          @message.setDelivered()
-          @message.isDelivered().should.be.true
-
-        it 'sets delivered to passed argument', ->
-          @message.setDelivered()
-          @message.setDelivered(false)
-          @message.isDelivered().should.be.false
-
-    describe 'message has id', ->
-
-      describe '#getId()', ->
-
-        it 'returns id', ->
-          should.not.exist @message.getId()
-
-      describe '#setId(id)', ->
-
-        it 'sets id', ->
-          @message.setId(42)
-          @message.getId().should.eq 42
-
-    describe 'can be hidden', ->
-
-      describe '#isHidden()', ->
-
-        it 'returns message hidden state', ->
-          @message.isHidden().should.be.false
-
-      describe '#hide()', ->
-
-        it 'set hidden state', ->
-          @message.hide()
-          @message.isHidden().should.be.true
-
-        it 'can be called via "hide" event', ->
-          @message.trigger('hide')
-          @message.isHidden().should.be.true
-
-        it 'should trigger hide event', ->
-          @message.on('hide', @spy)
-          @message.hide()
-          @spy.should.be.called
-
-        describe 'cookie usage', ->
-
-          beforeEach ->
-            global.cookie =
-              set: sinon.stub()
-              get: sinon.stub()
-
-          afterEach ->
-            global.cookie = undefined
-
-          it 'can read hidden state in cookies', ->
-            stub = sinon.stub().returns(true)
-            cookie.get = stub
-
-            message = new Noted.Message(42, 'trololo', store: 'cookie')
-            message.isHidden().should.be.true
-            stub.should.be.calledWith('noted_trololo_hidden')
-
-          it 'can store hidden state in cookies', ->
-            message = new Noted.Message(42, 'trololo', store: 'cookie')
-            message.hide()
-            cookie.set.should.be.calledWith('noted_trololo_hidden', true)
-
-          it 'ignores hide if first argument is true', ->
-            messageA = new Noted.Message(42, 'trololo', store: 'cookie')
-            messageA.hide(true)
-            messageB = new Noted.Message(42, 'trololo', store: 'cookie')
-            messageB.trigger('hide', true)
-            cookie.set.should.not.be.called
-
-        describe 'localStorage usage', ->
-
-          beforeEach ->
-            global.store =
-              set: sinon.stub()
-              get: sinon.stub()
-
-          afterEach ->
-            global.store = undefined
-
-          it 'can read hidden state in stores', ->
-            stub = sinon.stub().returns(true)
-            store.get = stub
-
-            message = new Noted.Message(42, 'trololo', store: 'store')
-            message.isHidden().should.be.true
-            stub.should.be.calledWith('noted_trololo_hidden')
-
-          it 'can store hidden state in stores', ->
-            message = new Noted.Message(42, 'trololo', store: 'store')
-            message.hide()
-            store.set.should.be.calledWith('noted_trololo_hidden', true)
-
   describe 'Event class', ->
 
     beforeEach ->
@@ -156,43 +15,43 @@ describe 'Noted library', ->
       it 'has Backbone.Events functions', ->
         fns = 'on off once listenTo stopListening listenToOnce'.split(/\s/)
         for fn in fns
-          @event[fn].should.be.defined
-          @event[fn].should.be.a 'function'
+          expect(@event[fn]).to.be.defined
+          expect(@event[fn]).to.be.a 'function'
 
     describe 'has name', ->
 
       describe '#getName()', ->
 
         it 'returns event name', ->
-          @event.getName().should.eq 'test'
+          expect(@event.getName()).to.be.eq 'test'
 
     describe 'has name', ->
 
       describe '#getMessages()', ->
 
         it 'returns list of messages', ->
-          @event.getMessages().should.eql []
+          expect(@event.getMessages()).to.be.eql []
 
       describe '#add()', ->
 
         it 'adds message to list', ->
           message = new Noted.Message()
           @event.add(message)
-          @event.getMessages().should.eql [message]
+          expect(@event.getMessages()).to.be.eql [message]
 
     describe 'event belongs to event group', ->
 
       describe '#getGroup()', ->
 
         it 'returns event group', ->
-          @event.getGroup().should.eq @group
+          expect(@event.getGroup()).to.be.eq @group
 
       describe '#setGroup(group)', ->
 
         it 'sets group to event', ->
           group = new Noted.EventGroup('one_more_group')
           @event.setGroup(group)
-          @event.getGroup().should.eq group
+          expect(@event.getGroup()).to.be.eq group
 
   describe 'EventGroup class', ->
 
@@ -202,7 +61,7 @@ describe 'Noted library', ->
     describe 'has name', ->
 
       it 'returns event name', ->
-        @eventGroup.getName().should.eq 'test'
+        expect(@eventGroup.getName()).to.be.eq 'test'
 
     describe 'can add and remove events', ->
 
@@ -213,17 +72,17 @@ describe 'Noted library', ->
 
         it 'adds event', ->
           @eventGroup.add(@event)
-          @eventGroup.get('test').should.eq @event
+          expect(@eventGroup.get('test')).to.be.eq @event
 
         it 'creates event', ->
           @eventGroup.add('test')
           event = @eventGroup.get('test')
-          event.should.be.instanceOf(Noted.Event)
-          event.getName().should.eq 'test'
+          expect(event).to.be.instanceOf(Noted.Event)
+          expect(event.getName()).to.be.eq 'test'
 
         it 'returns event', ->
-          @eventGroup.add(@event).should.be.instanceOf(Noted.Event)
-          @eventGroup.add('asd').should.be.instanceOf(Noted.Event)
+          expect(@eventGroup.add(@event)).to.be.instanceOf(Noted.Event)
+          expect(@eventGroup.add('asd')).to.be.instanceOf(Noted.Event)
 
       describe '#all()', ->
 
@@ -231,7 +90,7 @@ describe 'Noted library', ->
           @qwerty = new Noted.Event(null, 'qwerty')
           @eventGroup.add(@event)
           @eventGroup.add(@qwerty)
-          @eventGroup.all().should.eql [@event, @qwerty]
+          expect(@eventGroup.all()).to.be.eql [@event, @qwerty]
 
       describe '#get(name)', ->
 
@@ -239,8 +98,8 @@ describe 'Noted library', ->
           @qwerty = new Noted.Event(null, 'qwerty')
           @eventGroup.add(@event)
           @eventGroup.add(@qwerty)
-          @eventGroup.get('test').should.eq @event
-          @eventGroup.get('qwerty').should.eq @qwerty
+          expect(@eventGroup.get('test')).to.be.eq @event
+          expect(@eventGroup.get('qwerty')).to.be.eq @qwerty
 
       describe '#remove(event)', ->
 
@@ -249,24 +108,24 @@ describe 'Noted library', ->
           @eventGroup.add(@event)
           @eventGroup.add(@qwerty)
           @eventGroup.remove(@qwerty)
-          @eventGroup.get('test').should.eq @event
-          should.not.exist @eventGroup.get('qwerty')
+          expect(@eventGroup.get('test')).to.be.eq @event
+          expect(@eventGroup.get('qwerty')).to.not.exist
 
         it 'removes event by name from collectrion', ->
           @qwerty = new Noted.Event(null, 'qwerty')
           @eventGroup.add(@event)
           @eventGroup.add(@qwerty)
           @eventGroup.remove('qwerty')
-          @eventGroup.get('test').should.eq @event
-          should.not.exist @eventGroup.get('qwerty')
+          expect(@eventGroup.get('test')).to.be.eq @event
+          expect(@eventGroup.get('qwerty')).to.not.exist
 
     describe 'extended with Backbone.Events', ->
 
       it 'has Backbone.Events functions', ->
         fns = 'on off once listenTo stopListening listenToOnce'.split(/\s/)
         for fn in fns
-          @eventGroup[fn].should.be.defined
-          @eventGroup[fn].should.be.a 'function'
+          expect(@eventGroup[fn]).to.be.defined
+          expect(@eventGroup[fn]).to.be.a 'function'
 
   describe 'Broker class', ->
 
@@ -278,7 +137,7 @@ describe 'Noted library', ->
       it 'allows to subscribe to events and deliver messages', ->
         @broker.subscribe('event', @spy)
         @broker.publish('event')
-        @spy.should.be.calledOnce
+        expect(@spy).to.be.calledOnce
 
       describe '#subscribe', ->
 
@@ -286,19 +145,19 @@ describe 'Noted library', ->
           ctxA = spy: @spy
           @broker.subscribe('event', ((message) -> @spy(message)), ctxA)
           message = @broker.publish('event')
-          @spy.should.be.calledWith(message)
+          expect(@spy).to.be.calledWith(message)
 
         it 'allow to subscribe to event group', ->
           @broker.subscribe('group:', @spy)
           message = @broker.publish('group:event')
           message = @broker.publish('group:qwerty')
-          @spy.should.be.calledTwice
+          expect(@spy).to.be.calledTwice
 
         it 'can be delayed', ->
           @broker.publish('group:some_message')
           @broker.publish('group:some_message')
           @broker.subscribe('group:some_message', @spy, null, delayed: true)
-          @spy.should.be.calledTwice
+          expect(@spy).to.be.calledTwice
 
         it 'can be delayed for subscription for event groups', ->
           spyB = sinon.spy()
@@ -306,27 +165,27 @@ describe 'Noted library', ->
           @broker.publish('group_a:some_message_b')
           @broker.subscribe('group_a:', @spy, null, delayed: true)
           @broker.subscribe('group_b:', spyB, null, delayed: true)
-          @spy.should.be.calledTwice
-          spyB.should.not.be.called
+          expect(@spy).to.be.calledTwice
+          expect(spyB).to.not.be.called
 
         it 'uses passed context when it delayed', ->
           ctx = spy: @spy
           @broker.publish('group:some_message')
           @broker.subscribe('group:some_message', (-> @spy()), ctx, delayed: true)
-          @spy.should.be.called
+          expect(@spy).to.be.called
 
         it 'can be delayed for event group', ->
           @broker.publish('group:some_message')
           @broker.publish('group:some_message')
           @broker.subscribe('group:', @spy, null, delayed: true)
-          @spy.should.be.calledTwice
+          expect(@spy).to.be.calledTwice
 
         it 'ignore hidden message for delayed subscribe', ->
           message = @broker.publish('group:some_message')
           message.hide()
           @broker.publish('group:some_message')
           @broker.subscribe('group:some_message', @spy, null, delayed: true)
-          @spy.should.be.calledOnce
+          expect(@spy).to.be.calledOnce
 
         it 'can be delayed only for undelivered messages', ->
           spyB = sinon.spy()
@@ -334,34 +193,34 @@ describe 'Noted library', ->
           @broker.subscribe('group:some_message', spyB)
           @broker.publish('group:some_message')
           @broker.subscribe('group:some_message', @spy, null, delayed: true, undelivered: true)
-          @spy.should.be.calledOnce
-          @spy.should.be.calledWith(message)
+          expect(@spy).to.be.calledOnce
+          expect(@spy).to.be.calledWith(message)
 
       describe '#publish()', ->
 
         it 'publish message to subscribers', ->
           @broker.subscribe('event', @spy)
           message = @broker.publish('event')
-          @spy.should.be.calledWith(message)
+          expect(@spy).to.be.calledWith(message)
 
         it 'returns notification instance', ->
-          @broker.publish('event').should.be.instanceOf(Noted.Message)
+          expect(@broker.publish('event')).to.be.instanceOf(Noted.Message)
 
         it 'marks message as delivered', ->
           @broker.subscribe('event', @spy)
           messageA = @broker.publish('event')
           messageB = @broker.publish('test')
-          messageA.isDelivered().should.be.true
-          messageB.isDelivered().should.be.false
+          expect(messageA.isDelivered()).to.be.true
+          expect(messageB.isDelivered()).to.be.false
 
         it 'assigns specified id', ->
           message = @broker.publish('group_name:event_name#uniq_id')
-          message.getId().should.eq 'uniq_id'
+          expect(message.getId()).to.be.eq 'uniq_id'
 
         it 'add message to event list', ->
           message = @broker.publish('group_name:event_name')
           event   = @broker.get('group_name:event_name')
-          event.getMessages().should.eql [message]
+          expect(event.getMessages()).to.be.eql [message]
 
         it 'not emit event if message is hidden', ->
           message = new Noted.Message()
@@ -370,7 +229,7 @@ describe 'Noted library', ->
           OriginMessage = Noted.Message
           Noted.Message = -> message
           @broker.publish('test', 42)
-          @spy.should.not.be.called
+          expect(@spy).to.not.be.called
           Noted.Message = OriginMessage
 
         it 'passes options to message constructor', ->
@@ -380,7 +239,7 @@ describe 'Noted library', ->
           Noted.Message = stub
           options = { qwe: true }
           @broker.publish('group:test#id', 42, options)
-          stub.should.be.calledWith(42, 'id', options)
+          expect(stub).to.be.calledWith(42, 'id', options)
           Noted.Message = OriginMessage
 
         it 'setup auto hide if options.hideAfter exist', ->
@@ -388,7 +247,7 @@ describe 'Noted library', ->
           spy = sinon.stub(Noted.Message::, 'hide')
           @broker.publish('event', null, hideAfter: 3000)
           clock.tick(3500)
-          spy.should.be.called
+          expect(spy).to.be.called
           spy.restore()
           clock.restore()
 
@@ -397,7 +256,7 @@ describe 'Noted library', ->
           spy = sinon.stub(Noted.Message::, 'hide')
           @broker.publish('event', null, hideAfter: 3000, storeHide: true)
           clock.tick(3500)
-          spy.should.be.calledWith(false)
+          expect(spy).to.be.calledWith(false)
           spy.restore()
           clock.restore()
 
@@ -407,13 +266,13 @@ describe 'Noted library', ->
           @broker.subscribe('event', @spy)
           @broker.unsubscribe('event', @spy)
           @broker.publish('event')
-          @spy.should.not.be.called
+          expect(@spy).to.not.be.called
 
         it 'unsubscribes from message', ->
           @broker.subscribe('event', @spy)
           @broker.unsubscribe('event')
           @broker.publish('event')
-          @spy.should.not.be.called
+          expect(@spy).to.not.be.called
 
         it 'unsubscribes every message for given context', ->
           spyB = sinon.spy()
@@ -423,39 +282,39 @@ describe 'Noted library', ->
           @broker.subscribe('event', spyB, ctxB)
           @broker.unsubscribe(null, null, ctxA)
           @broker.publish('event')
-          @spy.should.not.be.called
-          spyB.should.be.called
+          expect(@spy).to.not.be.called
+          expect(spyB).to.be.called
 
       describe '#get(message)', ->
 
         it 'returns exist or new event for passed message', ->
           event = @broker.get('group_name:event_name')
-          event.getName().should.eq 'event_name'
+          expect(event.getName()).to.be.eq 'event_name'
 
         it 'returns event for passed message with id', ->
           event = @broker.get('group_name:event_name#uniq_id')
-          event.getName().should.eq 'event_name'
+          expect(event.getName()).to.be.eq 'event_name'
 
       describe '#parse(message)', ->
 
         it 'returns array where first el is group name', ->
           [groupName] = @broker.parse('group_name:event_name')
-          groupName.should.eq 'group_name'
+          expect(groupName).to.be.eq 'group_name'
 
         it 'returns array where second el is event name', ->
           [__, eventName] = @broker.parse('group_name:event_name')
-          eventName.should.eq 'event_name'
+          expect(eventName).to.be.eq 'event_name'
 
         it 'returns "all" event if event name is blank', ->
           [groupName, eventName] = @broker.parse('group_name:')
-          groupName.should.eq 'group_name'
-          eventName.should.eq 'all'
+          expect(groupName).to.be.eq 'group_name'
+          expect(eventName).to.be.eq 'all'
 
         it 'parses message id', ->
           [groupName, eventName, id] = @broker.parse('group_name:event#some_id')
-          groupName.should.eq 'group_name'
-          eventName.should.eq 'event'
-          id.should.eq 'some_id'
+          expect(groupName).to.be.eq 'group_name'
+          expect(eventName).to.be.eq 'event'
+          expect(id).to.be.eq 'some_id'
 
   describe 'MessagesList class', ->
 
@@ -469,35 +328,35 @@ describe 'Noted library', ->
       describe '#getBroker()', ->
 
         it 'returns broker', ->
-          @messagesList.getBroker().should.eq @broker
+          expect(@messagesList.getBroker()).to.be.eq @broker
 
       describe '#setBroker(broker)', ->
 
         it 'sets broker to messagesList', ->
           broker = new Noted.Broker()
           @messagesList.setBroker(broker)
-          @messagesList.getBroker().should.eq broker
+          expect(@messagesList.getBroker()).to.be.eq broker
 
     describe 'has context', ->
 
       describe '#getContext()', ->
 
         it 'returns messagesList context', ->
-          @messagesList.getContext().should.eq @messagesListCtx
+          expect(@messagesList.getContext()).to.be.eq @messagesListCtx
 
       describe '#setContext(other)', ->
 
         it 'sets context to messagesList', ->
           ctx = {}
           @messagesList.setContext(ctx)
-          @messagesList.getContext().should.eq ctx
+          expect(@messagesList.getContext()).to.be.eq ctx
 
     describe 'stores all messages', ->
 
       describe '#getMessages()', ->
 
         it 'returns empty array by default', ->
-          @messagesList.getMessages().should.eql []
+          expect(@messagesList.getMessages()).to.be.eql []
 
       describe '#store(message)', ->
 
@@ -506,14 +365,14 @@ describe 'Noted library', ->
           message2 = @messagesList.store(new Noted.Message())
           message3 = @messagesList.store(new Noted.Message())
           messages = @messagesList.getMessages()
-          messages[0].should.be.instanceOf Noted.Message
-          messages[0].should.be.eq message1
-          messages[1].should.be.eq message2
-          messages[2].should.be.eq message3
+          expect(messages[0]).to.be.instanceOf Noted.Message
+          expect(messages[0]).to.be.eq message1
+          expect(messages[1]).to.be.eq message2
+          expect(messages[2]).to.be.eq message3
 
         it 'returns stored message', ->
           message = new Noted.Message()
-          @messagesList.store(message).should.eq message
+          expect(@messagesList.store(message)).to.be.eq message
 
       describe '#trigger([options], event, [*args])', ->
 
@@ -524,8 +383,8 @@ describe 'Noted library', ->
           messageA.on('test', @spy)
           messageB.on('test', spyB)
           @messagesList.trigger('test', 42)
-          @spy.should.be.calledWith(messageA, 42)
-          spyB.should.be.calledWith(messageB, 42)
+          expect(@spy).to.be.calledWith(messageA, 42)
+          expect(spyB).to.be.calledWith(messageB, 42)
 
       describe '#on(event, callback, [options])', ->
 
@@ -534,7 +393,7 @@ describe 'Noted library', ->
           @messagesList.store(message)
           @messagesList.on('trololo', @spy)
           message.trigger('trololo', 42)
-          @spy.should.be.calledWith(message, 42)
+          expect(@spy).to.be.calledWith(message, 42)
 
         it 'ignores hidden messages', ->
           spyB = sinon.spy()
@@ -544,8 +403,8 @@ describe 'Noted library', ->
           messageB.on('test', spyB)
           messageA.trigger('hide')
           @messagesList.trigger('test', 42)
-          @spy.should.not.be.called
-          spyB.should.be.calledWith(messageB, 42)
+          expect(@spy).to.not.be.called
+          expect(spyB).to.be.calledWith(messageB, 42)
 
         it 'allow to specify when hidden messages should be trigerred', ->
           spyB = sinon.spy()
@@ -555,8 +414,8 @@ describe 'Noted library', ->
           messageB.on('test', spyB)
           messageA.trigger('hide')
           @messagesList.trigger(hidden: true, 'test', 42)
-          @spy.should.be.calledWith(messageA, 42)
-          spyB.should.be.calledWith(messageB, 42)
+          expect(@spy).to.be.calledWith(messageA, 42)
+          expect(spyB).to.be.calledWith(messageB, 42)
 
       describe '#off([event], [callback])', ->
 
@@ -566,7 +425,7 @@ describe 'Noted library', ->
           @messagesList.on('trololo', @spy)
           @messagesList.off('trololo', @spy)
           message.trigger('trololo', 42)
-          @spy.should.not.be.called
+          expect(@spy).to.not.be.called
 
         it 'stop listening stored messages by event', ->
           message = new Noted.Message()
@@ -574,7 +433,7 @@ describe 'Noted library', ->
           @messagesList.on('trololo', @spy)
           @messagesList.off('trololo')
           message.trigger('trololo', 42)
-          @spy.should.not.be.called
+          expect(@spy).to.not.be.called
 
         it 'stop listening all events', ->
           message = new Noted.Message()
@@ -584,7 +443,7 @@ describe 'Noted library', ->
           @messagesList.off()
           message.trigger('trololo')
           message.trigger('test')
-          @spy.should.not.be.called
+          expect(@spy).to.not.be.called
 
   describe 'Emitter class', ->
 
@@ -601,20 +460,20 @@ describe 'Noted library', ->
           stub    = sinon.stub(@broker, 'publish').returns(message)
 
           @emitter.emit('qwerty', 1)
-          stub.should.be.calledWith('qwerty', 1)
+          expect(stub).to.be.calledWith('qwerty', 1)
 
           stub.restore()
 
         it 'returns message instance', ->
           message = @emitter.emit('test', 42)
-          message.getBody().should.eq 42
-          message.should.be.instanceOf Noted.Message
+          expect(message.getBody()).to.be.eq 42
+          expect(message).to.be.instanceOf Noted.Message
 
         it 'passes options to broker', ->
           spy = sinon.stub(@broker, 'publish')
           options = { a: 1, b: 2 }
           @emitter.emit('test', 42, options)
-          spy.should.be.calledWith('test', 42, options)
+          expect(spy).to.be.calledWith('test', 42, options)
 
   describe 'Receiver class', ->
 
@@ -630,24 +489,24 @@ describe 'Noted library', ->
         it 'listen for messages in broker', ->
           @receiver.listen('some_message', @spy)
           message = @broker.publish('some_message')
-          @spy.should.be.called
+          expect(@spy).to.be.called
 
         it 'stores received messages in list', ->
           @receiver.listen('some_message', @spy)
           message = @broker.publish('some_message')
           messages = @receiver.getMessages()
-          messages[0].should.eq message
+          expect(messages[0]).to.be.eq message
 
         it 'uses context', ->
           @receiverCtx.spy = @spy
           @receiver.listen('some_message', -> @spy())
           message = @broker.publish('some_message')
-          @spy.should.be.called
+          expect(@spy).to.be.called
 
         it 'can listen to emitted messages before listen is called', ->
           @broker.publish('some_message')
           @receiver.listen('some_message', @spy, delayed: true)
-          @spy.should.be.called
+          expect(@spy).to.be.called
 
         it 'can listen to emitted and undelivered messages before listen is called', ->
           spyB = sinon.spy()
@@ -655,8 +514,8 @@ describe 'Noted library', ->
           @receiver.listen('some_message', spyB)
           @broker.publish('some_message')
           @receiver.listen('some_message', @spy, delayed: true, undelivered: true)
-          @spy.should.be.calledOnce
-          @spy.should.be.calledWith(message)
+          expect(@spy).to.be.calledOnce
+          expect(@spy).to.be.calledWith(message)
 
       describe '#stop([message], [callback])', ->
 
@@ -664,7 +523,7 @@ describe 'Noted library', ->
           @receiver.listen('some_message', @spy)
           @receiver.stop()
           message = @broker.publish('some_message')
-          @spy.should.not.be.called
+          expect(@spy).to.not.be.called
 
         it 'stops listening all evets but only for given receiver', ->
           spyB = sinon.spy()
@@ -673,8 +532,8 @@ describe 'Noted library', ->
           receiverB.listen('some_message', spyB)
           @receiver.stop()
           message = @broker.publish('some_message')
-          @spy.should.not.be.called
-          spyB.should.be.called
+          expect(@spy).to.not.be.called
+          expect(spyB).to.be.called
 
         it 'stop listening of message', ->
           spyB = sinon.spy()
@@ -682,8 +541,8 @@ describe 'Noted library', ->
           @receiver.listen('some_message', spyB)
           @receiver.stop('some_message')
           message = @broker.publish('some_message')
-          @spy.should.not.be.called
-          spyB.should.not.be.called
+          expect(@spy).to.not.be.called
+          expect(spyB).to.not.be.called
 
         it 'stop listening of message for given callback', ->
           spyB = sinon.spy()
@@ -691,5 +550,5 @@ describe 'Noted library', ->
           @receiver.listen('some_message', spyB)
           @receiver.stop('some_message', @spy)
           message = @broker.publish('some_message')
-          @spy.should.not.be.called
-          spyB.should.be.called
+          expect(@spy).to.not.be.called
+          expect(spyB).to.be.called
