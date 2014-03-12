@@ -17,6 +17,7 @@
     "sinon": "",
     "sinon-chai": "",
     "karma": "",
+    "karma-cli": "",
     "karma-coffee-preprocessor": "",
     "karma-phantomjs-launcher": "",
     "karma-sauce-launcher": "",
