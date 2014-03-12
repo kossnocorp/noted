@@ -19,6 +19,7 @@
     "karma": "",
     "karma-coffee-preprocessor": "",
     "karma-phantomjs-launcher": "",
+    "karma-sauce-launcher": "",
     "karma-mocha": "",
     "karma-chai": "",
     "karma-chai-sinon": ""
@@ -29,6 +30,6 @@
   },
 
   "scripts": {
-    "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS"
+    "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS,ie9"
   }
 }

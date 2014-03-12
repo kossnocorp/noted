@@ -14,6 +14,19 @@ module.exports = (config) ->
     port: 9876
     colors: true
     autoWatch: true
-    browsers: ['PhantomJS']
     captureTimeout: 60000
     singleRun: false
+
+    sauceLabs:
+      username: 'kossnocorp-noted'
+      accessKey: '8f8692f8-e4c4-45ff-b8d2-1d5b482dc249'
+      testName: 'Noted.js'
+
+    customLaunchers:
+      ie9:
+        base: 'SauceLabs'
+        browserName: 'internet explorer'
+        version: 9
+        platform: 'Windows 7'
+
+    browsers: ['PhantomJS']
