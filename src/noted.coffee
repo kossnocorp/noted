@@ -127,7 +127,7 @@ class Noted.Broker
     if options.delayed
       if event.getName() == 'all'
         eventGroups = [event.getGroup()] || @_eventGroups
-        for name, group of eventGroups
+        for own name, group of eventGroups
           for event in group.all()
             for message in event.getMessages()
               if (not options.undelivered or not message.isDelivered()) and not message.isHidden()
