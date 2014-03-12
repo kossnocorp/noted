@@ -24,10 +24,6 @@
     "karma-chai-sinon": ""
   },
 
-  "dependencies": {
-    "backbone": ""
-  },
-
   "engine": {
     "node": ">= 0.10"
   },

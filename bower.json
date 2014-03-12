@@ -1,0 +1,23 @@
+{
+  "name": "noted",
+  "version": "0.1.1",
+  "authors": [
+    "Sasha Koss <kossnocorp@gmail.com>"
+  ],
+  "homepage": "https://github.com/kossnocorp/modula",
+  "private": false,
+  "description": "Notification controller for JavaScript",
+
+  "main": "lib/noted.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "spec"
+  ],
+
+  "dependencies": {
+    "backbone": ""
+  }
+}
