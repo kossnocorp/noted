@@ -13,6 +13,6 @@ gulp.task 'minify', ->
   gulp.src('lib/*.js')
     .pipe(uglify(outSourceMap: false))
     .pipe(rename(suffix: '.min'))
-    .pipe(gulp.dest('lib/'))
+    .pipe(gulp.dest('dist/'))
 
 gulp.task 'prepare', ['build', 'minify']
