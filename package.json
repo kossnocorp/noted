@@ -6,23 +6,33 @@
 
   "devDependencies": {
     "coffee-script": "",
-    "mocha":         "",
-    "chai":          "",
-    "sinon":         "",
-    "sinon-chai":    ""
+    "gulp": "",
+    "gulp-util": "",
+    "gulp-coffee": "",
+    "gulp-uglify": "",
+    "gulp-rename": "",
+    "coffeegulp": "",
+    "mocha": "",
+    "chai": "",
+    "sinon": "",
+    "sinon-chai": "",
+    "karma": "",
+    "karma-coffee-preprocessor": "",
+    "karma-phantomjs-launcher": "",
+    "karma-mocha": "",
+    "karma-chai": "",
+    "karma-chai-sinon": ""
   },
 
   "dependencies": {
     "backbone": ""
   },
 
-  "license": "MIT",
-
   "engine": {
-    "node": ">=0.4"
+    "node": ">= 0.10"
   },
 
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha ./spec/*_spec.*coffee --compilers coffee:coffee-script --compilers litcoffee:coffee-script -R spec -c"
+    "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS"
   }
 }
