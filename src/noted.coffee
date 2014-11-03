@@ -52,7 +52,7 @@ class Noted.Message
   _storage: ->
     if @options.store is 'cookie' and cookie?
       cookie
-    else if @options.store is 'store' and store?
+    else if @options.store is 'store' and store?.enabled
       store
     else
       null

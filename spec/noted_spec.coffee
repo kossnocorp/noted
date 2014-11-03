@@ -2,7 +2,8 @@ describe 'Noted library', ->
 
   beforeEach ->
     @spy = sinon.spy()
-    global.cookie = undefined
+    @global = window
+    @global.cookie = undefined
 
   describe 'Event class', ->
 

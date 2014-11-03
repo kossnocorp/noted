@@ -1,6 +1,7 @@
 describe 'Noted.Message', ->
 
   beforeEach ->
+    @global = window
     @spy = sinon.spy()
     @message = new Noted.Message('Test')
 
@@ -90,12 +91,12 @@ describe 'Noted.Message', ->
       describe 'cookie usage', ->
 
         beforeEach ->
-          global.cookie =
+          @global.cookie =
             set: sinon.stub()
             get: sinon.stub()
 
         afterEach ->
-          global.cookie = undefined
+          @global.cookie = undefined
 
         it 'can read hidden state in cookies', ->
           stub = sinon.stub().returns(true)
@@ -120,12 +121,13 @@ describe 'Noted.Message', ->
       describe 'localStorage usage', ->
 
         beforeEach ->
-          global.store =
+          @global.store =
             set: sinon.stub()
             get: sinon.stub()
+            enabled: true
 
         afterEach ->
-          global.store = undefined
+          @global.store = undefined
 
         it 'can read hidden state in stores', ->
           stub = sinon.stub().returns(true)
@@ -134,6 +136,15 @@ describe 'Noted.Message', ->
           message = new Noted.Message(42, 'trololo', store: 'store')
           expect(message.isHidden()).to.be.true
           expect(stub).to.be.calledWith('noted_trololo_hidden')
+
+        it "can't read hidden state if store is disabled (in browser private mode)", ->
+          @global.store.enabled = false
+          stub = sinon.stub().returns(true)
+          store.get = stub
+
+          message = new Noted.Message(42, 'trololo', store: 'store')
+          expect(message.isHidden()).to.be.false
+          expect(stub).to.be.notCalled
 
         it 'can store hidden state in stores', ->
           message = new Noted.Message(42, 'trololo', store: 'store')
