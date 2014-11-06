@@ -144,9 +144,16 @@ describe 'Noted.Message', ->
 
           message = new Noted.Message(42, 'trololo', store: 'store')
           expect(message.isHidden()).to.be.false
-          expect(stub).to.be.notCalled
+          expect(stub).to.be.not.called
 
         it 'can store hidden state in stores', ->
           message = new Noted.Message(42, 'trololo', store: 'store')
           message.hide()
           expect(store.set).to.be.calledWith('noted_trololo_hidden', true)
+
+        it "can't store hidden state in stores if store is disabled (in browser private mode)", ->
+          @global.store.enabled = false
+          message = new Noted.Message(42, 'trololo', store: 'store')
+          message.hide()
+          expect(store.set).to.be.not.called
+

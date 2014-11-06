@@ -39,7 +39,7 @@ class Noted.Message
 
     if @options.store == 'cookie' and cookie?
       cookie.set("noted_#{@getId()}_hidden", true)
-    else if @options.store == 'store' and store?
+    else if @options.store == 'store' and store?.enabled
       store.set("noted_#{@getId()}_hidden", true)
 
   _isHidden: (id) ->
