@@ -9,7 +9,7 @@ gulp.task 'build', ->
     .pipe(coffee(bare: false).on('error', gutil.log))
     .pipe(gulp.dest('lib/'))
 
-gulp.task 'minify', ->
+gulp.task 'minify', ['build'], ->
   gulp.src('lib/*.js')
     .pipe(uglify(outSourceMap: false))
     .pipe(rename(suffix: '.min'))
